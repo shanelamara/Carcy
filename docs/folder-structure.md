@@ -17,7 +17,8 @@ src/
     page.tsx                       # Thin route importing storefront/server
     layout.tsx                     # Root document, fonts, metadata
     globals.css                    # Shared tokens and storefront styles
-    favicon.ico
+    favicon.ico                    # Small, brand-colored browser favicon
+    icon.svg                       # Editable vector source for the favicon
     admin/
       page.tsx                     # Photo manager entry
       photos/

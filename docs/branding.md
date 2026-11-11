@@ -81,8 +81,10 @@ reference-specific compositions without editing the source image.
 - In compact navigation, a plain-text "CarCy 3D Shop" identifier is acceptable until a purpose-made compact mark is approved. It is a text label, not a recreated version of the sculpted wordmark.
 
 A transparent master, vector master, simplified symbol, favicon, and independent
-mascot assets are future production work. Do not extract or approximate them from
-the badge and present them as approved identity variants.
+mascot assets remain future production work. The browser favicon is a simple
+typographic "C" on the brand orange; it is a small-tab utility, not an approved
+logo or compact identity mark. Keep the full logo intact, and do not extract or
+approximate a symbol from the badge.
 
 ## Photography and visual language
 
