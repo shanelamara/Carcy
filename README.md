@@ -16,6 +16,21 @@ bun dev
 
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
+## Admin access code
+
+The admin photo manager requires `ADMIN_ACCESS_CODE`. A private local value is
+configured in `.env.local`; do not commit that file. For another environment,
+copy `.env.example` to `.env.local` and set a unique random code of at least 16
+characters. Generate one with:
+
+```bash
+node -e "console.log(require('node:crypto').randomBytes(24).toString('base64url'))"
+```
+
+Set the same variable in your deployment's secret environment configuration.
+The shared code is a basic gate, not individual accounts or rate-limited
+authentication.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

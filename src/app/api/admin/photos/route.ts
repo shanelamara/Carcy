@@ -3,10 +3,18 @@ import path from "node:path";
 
 import { NextResponse } from "next/server";
 
+import { hasAdminAccess, isSameOriginRequest } from "@/lib/admin-access";
 import { getProductPhotos, saveProductPhotos } from "@/modules/catalog/server";
 import type { ProductPhoto } from "@/modules/catalog";
 
 const PUBLIC_PRODUCTS_DIR = path.join(process.cwd(), "public", "images", "products");
+
+function unauthorizedResponse() {
+  return NextResponse.json(
+    { error: "Enter the admin access code to continue." },
+    { status: 401, headers: { "Cache-Control": "no-store" } },
+  );
+}
 
 function normalizePhoto(input: Partial<ProductPhoto>): ProductPhoto {
   const src = typeof input.src === "string" ? input.src.trim() : "";
@@ -54,11 +62,22 @@ async function handleUpload(formData: FormData): Promise<ProductPhoto> {
 }
 
 export async function GET() {
+  if (!(await hasAdminAccess())) {
+    return unauthorizedResponse();
+  }
+
   const photos = await getProductPhotos();
-  return NextResponse.json(photos);
+  return NextResponse.json(photos, { headers: { "Cache-Control": "no-store" } });
 }
 
 export async function POST(request: Request) {
+  if (!(await hasAdminAccess())) {
+    return unauthorizedResponse();
+  }
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Request origin is not allowed." }, { status: 403 });
+  }
+
   try {
     const contentType = request.headers.get("content-type") ?? "";
 
@@ -84,6 +103,13 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
+  if (!(await hasAdminAccess())) {
+    return unauthorizedResponse();
+  }
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Request origin is not allowed." }, { status: 403 });
+  }
+
   try {
     const payload = (await request.json()) as Partial<ProductPhoto>;
     const photos = await getProductPhotos();
@@ -101,6 +127,13 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
+  if (!(await hasAdminAccess())) {
+    return unauthorizedResponse();
+  }
+  if (!isSameOriginRequest(request)) {
+    return NextResponse.json({ error: "Request origin is not allowed." }, { status: 403 });
+  }
+
   try {
     const payload = (await request.json()) as { id?: string };
     const photoId = payload.id;

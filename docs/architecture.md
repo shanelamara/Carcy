@@ -19,13 +19,16 @@ vertical carousel. Color previews and motion controls run locally in the browser
 Product details and availability remain unconfirmed. Contact links lead to
 Facebook; they do not submit an order.
 
-The `/admin/photos` screen provides a basic photo manager backed by
-`admin/.data/photos.json`, with uploaded files stored in
-`public/images/products`. Its API has no authentication and writes to the local
-filesystem, so it is only a prototype for trusted local use, not a safe public
-admin surface. The full admin portal, authenticated access, durable media and
-product storage, and publication workflows remain planned. No database, auth
-provider, message broker, or event bus is added merely to establish the architecture.
+The `/admin` screen requires a server-configured shared access code. Successful
+entry creates a signed, HTTP-only, same-site session cookie that expires after
+12 hours. The photo page and each photo API operation check that session;
+write requests also require a same-origin `Origin` header. The private code is
+stored in the `ADMIN_ACCESS_CODE` environment variable. The photo manager is
+backed by `admin/.data/photos.json`, with uploaded files stored in
+`public/images/products`. This shared code is a basic gate, not per-user
+authentication or a substitute for proper authentication and rate limiting on
+a public deployment. Durable media and product storage and publication workflows
+remain planned.
 
 ## Module ownership
 
@@ -123,7 +126,7 @@ server authorization and must not share private data through public caches.
 
 An admin mutation follows this sequence:
 
-1. The Next.js action/HTTP entry authenticates, authorizes, and parses untrusted input.
+1. The Next.js action/HTTP entry checks the admin session, verifies same-origin writes, and parses untrusted input.
 2. The catalog application operation applies domain rules and persists through its private adapter.
 3. Relevant public listing/detail caches are invalidated after success, including old slugs or unpublished records.
 4. The UI receives a safe typed result and preserves input on failure.
@@ -136,6 +139,7 @@ add a shared transaction boundary only when a concrete use case needs one.
 ## Security and failure handling
 
 - Enforce permissions for each privileged read, write, or upload, not only in navigation, layouts, or proxy middleware.
+- Configure the shared admin code with the private `ADMIN_ACCESS_CODE` environment variable; never commit its value.
 - Keep database clients, private fields, and credentials in guarded server modules.
 - Keep reusable schemas and pure types client-safe; validate again on the server and explicitly select writable fields.
 - Return actionable field/form errors without exposing internal failures. Confirm success only after persistence succeeds.

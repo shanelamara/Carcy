@@ -20,11 +20,13 @@ src/
     favicon.ico                    # Small, brand-colored browser favicon
     icon.svg                       # Editable vector source for the favicon
     admin/
-      page.tsx                     # Photo manager entry
+      page.tsx                     # Shared access-code gate
+      admin-access-panel.tsx       # Login and sign-out controls
       photos/
         page.tsx                   # Loads initial photo data
         photos-manager.tsx         # Route-specific photo editing UI
     api/
+      admin/access/route.ts        # Access-code session endpoint
       admin/photos/route.ts        # Photo manager API
   modules/
     catalog/
@@ -65,11 +67,13 @@ src/
     site.ts                        # Site-wide contact destination
   lib/
     utils.ts                       # Generic class utility
+    admin-access.ts                # Shared-code session and origin checks
   assets/logos/                    # Original and prototype logos
 public/images/                     # Public prototype illustrations and product photos
 ```
 
-Root configuration includes `package.json`, `pnpm-lock.yaml`, `components.json`,
+Root configuration includes `.env.example` (admin access-code template),
+`package.json`, `pnpm-lock.yaml`, `components.json`,
 `next.config.ts`, `tsconfig.json`, and `eslint.config.mjs`. `AGENTS.md` points agents
 to architecture, placement, design, product, and commit conventions. The redesign
 selection is recorded in `.taste-skill/plan.md`; DESIGN.md remains the ongoing

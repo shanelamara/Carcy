@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 
 import type { ProductPhoto } from "@/modules/catalog";
@@ -10,7 +11,7 @@ type PhotosManagerProps = { initialPhotos: ProductPhoto[] };
 
 const emptyPhoto: PhotoFormState = {
   id: "",
-  src: "/images/products/",
+  src: "",
   alt: "",
   width: 1200,
   height: 1600,
@@ -18,6 +19,7 @@ const emptyPhoto: PhotoFormState = {
 };
 
 export default function PhotosManager({ initialPhotos }: PhotosManagerProps) {
+  const router = useRouter();
   const [photos, setPhotos] = useState<ProductPhoto[]>(initialPhotos);
   const [form, setForm] = useState<PhotoFormState>(emptyPhoto);
   const [status, setStatus] = useState(
@@ -28,9 +30,20 @@ export default function PhotosManager({ initialPhotos }: PhotosManagerProps) {
 
   const hasEditingId = useMemo(() => Boolean(form.id), [form.id]);
 
+  const redirectIfSessionExpired = (response: Response) => {
+    if (response.status !== 401) {
+      return false;
+    }
+
+    router.push("/admin");
+    return true;
+  };
+
   const loadPhotos = async () => {
     try {
       const response = await fetch("/api/admin/photos");
+      if (redirectIfSessionExpired(response)) return;
+
       const nextPhotos = (await response.json()) as ProductPhoto[];
       setPhotos(nextPhotos);
       setStatus(nextPhotos.length > 0 ? "Photos loaded." : "No photos yet. Add the first one.");
@@ -41,6 +54,8 @@ export default function PhotosManager({ initialPhotos }: PhotosManagerProps) {
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    if (!hasEditingId) return;
+
     setIsSaving(true);
 
     try {
@@ -56,6 +71,7 @@ export default function PhotosManager({ initialPhotos }: PhotosManagerProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+      if (redirectIfSessionExpired(response)) return;
 
       const result = (await response.json()) as ProductPhoto[] | { error?: string };
 
@@ -85,16 +101,14 @@ export default function PhotosManager({ initialPhotos }: PhotosManagerProps) {
     try {
       const formData = new FormData();
       formData.append("file", file);
-      formData.append("alt", form.alt || file.name);
-      formData.append("id", form.id || `photo-${Date.now()}`);
-      formData.append("width", String(form.width || 1200));
-      formData.append("height", String(form.height || 1600));
-      formData.append("order", String(form.order || 0));
+      formData.append("width", "1200");
+      formData.append("height", "1600");
 
       const response = await fetch("/api/admin/photos", {
         method: "POST",
         body: formData,
       });
+      if (redirectIfSessionExpired(response)) return;
 
       const result = (await response.json()) as ProductPhoto[] | { error?: string };
 
@@ -126,6 +140,7 @@ export default function PhotosManager({ initialPhotos }: PhotosManagerProps) {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ id: photoId }),
       });
+      if (redirectIfSessionExpired(response)) return;
 
       if (!response.ok) {
         throw new Error("Unable to delete the photo.");
@@ -149,7 +164,7 @@ export default function PhotosManager({ initialPhotos }: PhotosManagerProps) {
           <p className="text-xs font-semibold uppercase tracking-[0.2em] text-[#8b3800]">Admin</p>
           <h1 className="mt-3 text-4xl font-semibold tracking-[-0.06em]">Product photo manager</h1>
           <p className="mt-3 text-sm text-[#595959]">
-            Use a local image path like /images/products/photo-xx.jpg, then save to update the storefront.
+            Upload an image to add it to the storefront. Edit an existing photo to adjust its dimensions.
           </p>
         </header>
 
@@ -159,80 +174,67 @@ export default function PhotosManager({ initialPhotos }: PhotosManagerProps) {
             className="min-w-0 rounded-2xl border border-black/10 bg-white p-6 shadow-sm"
           >
             <h2 className="text-2xl font-semibold tracking-[-0.04em]">
-              {hasEditingId ? "Edit photo" : "Add a photo"}
+              {hasEditingId ? "Edit photo dimensions" : "Upload a photo"}
             </h2>
 
             <div className="mt-6 space-y-4">
               <div className="space-y-2">
-                <label className="block text-sm font-medium text-[#161616]">Upload an image</label>
+                <span className="block text-sm font-medium text-[#161616]">Upload an image</span>
                 <label className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#d7d1ca] bg-white px-4 py-2 text-sm font-medium text-[#161616] transition hover:border-[#FF6500]">
-                  <input type="file" accept="image/*" onChange={handleUpload} className="hidden" />
-                  {isUploading ? "Uploading..." : "Choose photo to upload"}
+                  <input
+                    type="file"
+                    accept="image/*"
+                    aria-label="Choose a photo to upload"
+                    onChange={handleUpload}
+                    className="hidden"
+                  />
+                  {isUploading ? "Uploading..." : "Choose photo"}
                 </label>
               </div>
-
-              <label className="block text-sm font-medium text-[#161616]">
-                Image path
-                <input
-                  value={form.src}
-                  onChange={(event) => setForm((current) => ({ ...current, src: event.target.value }))}
-                  className="mt-1 w-full rounded-md border border-[#d7d1ca] bg-[#fff] p-3 text-sm outline-none ring-0 transition focus:border-[#FF6500]"
-                  placeholder="/images/products/photo-17.jpg"
-                />
-              </label>
-
-              <label className="block text-sm font-medium text-[#161616]">
-                Alt text
-                <input
-                  value={form.alt}
-                  onChange={(event) => setForm((current) => ({ ...current, alt: event.target.value }))}
-                  className="mt-1 w-full rounded-md border border-[#d7d1ca] bg-[#fff] p-3 text-sm outline-none transition focus:border-[#FF6500]"
-                  placeholder="Purple personalized keychain shown in a studio shot"
-                />
-              </label>
-
-              <div className="grid gap-4 sm:grid-cols-2">
-                <label className="block text-sm font-medium text-[#161616]">
-                  Width
-                  <input
-                    type="number"
-                    value={form.width}
-                    onChange={(event) => setForm((current) => ({ ...current, width: Number(event.target.value) || 1200 }))}
-                    className="mt-1 w-full rounded-md border border-[#d7d1ca] bg-[#fff] p-3 text-sm outline-none transition focus:border-[#FF6500]"
-                  />
-                </label>
-
-                <label className="block text-sm font-medium text-[#161616]">
-                  Height
-                  <input
-                    type="number"
-                    value={form.height}
-                    onChange={(event) => setForm((current) => ({ ...current, height: Number(event.target.value) || 1600 }))}
-                    className="mt-1 w-full rounded-md border border-[#d7d1ca] bg-[#fff] p-3 text-sm outline-none transition focus:border-[#FF6500]"
-                  />
-                </label>
-              </div>
-            </div>
-
-            <div className="mt-6 flex flex-wrap gap-3">
-              <button
-                type="submit"
-                disabled={isSaving}
-                className="inline-flex items-center justify-center rounded-full bg-[#FF6500] px-5 py-3 text-sm font-medium text-[#161616] transition hover:bg-[#F58A2E] disabled:cursor-not-allowed disabled:opacity-70"
-              >
-                {isSaving ? "Saving..." : hasEditingId ? "Save changes" : "Add photo"}
-              </button>
 
               {hasEditingId && (
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <label className="block text-sm font-medium text-[#161616]">
+                    Width
+                    <input
+                      type="number"
+                      value={form.width}
+                      onChange={(event) => setForm((current) => ({ ...current, width: Number(event.target.value) || 1200 }))}
+                      className="mt-1 w-full rounded-md border border-[#d7d1ca] bg-[#fff] p-3 text-base outline-none transition focus:border-[#FF6500]"
+                    />
+                  </label>
+
+                  <label className="block text-sm font-medium text-[#161616]">
+                    Height
+                    <input
+                      type="number"
+                      value={form.height}
+                      onChange={(event) => setForm((current) => ({ ...current, height: Number(event.target.value) || 1600 }))}
+                      className="mt-1 w-full rounded-md border border-[#d7d1ca] bg-[#fff] p-3 text-base outline-none transition focus:border-[#FF6500]"
+                    />
+                  </label>
+                </div>
+              )}
+            </div>
+
+            {hasEditingId && (
+              <div className="mt-6 flex flex-wrap gap-3">
+                <button
+                  type="submit"
+                  disabled={isSaving}
+                  className="inline-flex min-h-12 items-center justify-center rounded-full bg-[#FF6500] px-5 py-3 text-sm font-medium text-[#161616] transition hover:bg-[#F58A2E] disabled:cursor-not-allowed disabled:opacity-70"
+                >
+                  {isSaving ? "Saving..." : "Save dimensions"}
+                </button>
                 <button
                   type="button"
                   onClick={() => setForm(emptyPhoto)}
-                  className="inline-flex items-center justify-center rounded-full border border-[#d7d1ca] bg-white px-5 py-3 text-sm font-medium text-[#161616] transition hover:border-[#FF6500]"
+                  className="inline-flex min-h-12 items-center justify-center rounded-full border border-[#d7d1ca] bg-white px-5 py-3 text-sm font-medium text-[#161616] transition hover:border-[#FF6500]"
                 >
                   Cancel
                 </button>
-              )}
-            </div>
+              </div>
+            )}
 
             <p className="mt-4 text-sm text-[#595959]">{status}</p>
           </form>
