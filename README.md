@@ -31,6 +31,18 @@ Set the same variable in your deployment's secret environment configuration.
 The shared code is a basic gate, not individual accounts or rate-limited
 authentication.
 
+## Product photo storage
+
+Vercel deployments need persistent storage for admin photo uploads and edits.
+In the Vercel project, open **Storage**, create a **public Blob** store, and
+connect it to the project’s Production environment. Ensure the connection
+provides `BLOB_READ_WRITE_TOKEN`, then redeploy. Connect Preview as well if you
+manage photos from preview deployments. The token must remain private.
+
+Local development continues to use `admin/.data/photos.json` and
+`public/images/products`; those filesystem writes are for local development
+only. Vercel Blob stores uploaded images and the photo list in production.
+
 You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
 
 This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.

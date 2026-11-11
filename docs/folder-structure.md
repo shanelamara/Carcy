@@ -9,9 +9,6 @@ naming, validation, styling, and code standards.
 ## Current structure
 
 ```text
-admin/
-  .data/
-    photos.json                    # Local product-photo metadata store
 src/
   app/
     page.tsx                       # Thin route importing storefront/server
@@ -31,7 +28,7 @@ src/
   modules/
     catalog/
       index.ts                     # Public client-safe UI and types
-      server.ts                    # Public server-only catalog and photo data
+      server.ts                    # Catalog reads and persistent photo storage
       components/
         product-catalog.tsx
         product-card.tsx
@@ -72,7 +69,7 @@ src/
 public/images/                     # Public prototype illustrations and product photos
 ```
 
-Root configuration includes `.env.example` (admin access-code template),
+Root configuration includes `.env.example` (admin access-code and Blob setup),
 `package.json`, `pnpm-lock.yaml`, `components.json`,
 `next.config.ts`, `tsconfig.json`, and `eslint.config.mjs`. `AGENTS.md` points agents
 to architecture, placement, design, product, and commit conventions. The redesign

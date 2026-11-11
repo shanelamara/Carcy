@@ -23,20 +23,22 @@ The `/admin` screen requires a server-configured shared access code. Successful
 entry creates a signed, HTTP-only, same-site session cookie that expires after
 12 hours. The photo page and each photo API operation check that session;
 write requests also require a same-origin `Origin` header. The private code is
-stored in the `ADMIN_ACCESS_CODE` environment variable. The photo manager is
-backed by `admin/.data/photos.json`, with uploaded files stored in
-`public/images/products`. This shared code is a basic gate, not per-user
-authentication or a substitute for proper authentication and rate limiting on
-a public deployment. If the code is missing or shorter than 16 characters, the
-admin screen displays a setup message and protected APIs return `503` rather than
-crashing. Durable media and product storage and publication workflows remain
-planned.
+stored in the `ADMIN_ACCESS_CODE` environment variable. In production, the photo
+manager stores uploaded images and its photo list in a connected public Vercel
+Blob store; local development uses `admin/.data/photos.json` and
+`public/images/products`. If Blob storage is not connected on Vercel, the admin
+photo page displays a setup message and its APIs return `503`. This shared code
+is a basic gate, not per-user authentication or a substitute for proper
+authentication and rate limiting on a public deployment. If the code is missing
+or shorter than 16 characters, the admin screen displays a setup message and
+protected APIs return `503` rather than crashing. Durable product storage and
+publication workflows remain planned.
 
 ## Module ownership
 
 | Module | Owns | Dependencies |
 | --- | --- | --- |
-| `catalog` | Product contracts, collection filters, concept fixtures, catalog UI, product details, and local photo metadata; future product validation, management, visibility, and durable persistence | Shared code only |
+| `catalog` | Product contracts, collection filters, concept fixtures, catalog UI, product details, and photo metadata/media persistence; future product validation, management, visibility, and durable product persistence | Shared code only |
 | `storefront` | Public page composition, navigation, hero, personalization preview, story, footer, and storefront motion composition | `catalog` through its public APIs, plus shared code |
 
 Future identity or media capabilities become modules when actual requirements
@@ -115,10 +117,11 @@ permission to query the owner's tables directly.
 
 Today the server route composes `storefront/server`, which obtains photo metadata
 from `catalog/server` and passes serializable data into catalog UI. Catalog
-metadata defaults to private photo fixtures and is stored in
-`admin/.data/photos.json` after photo-manager edits. The `/admin/photos` page
-loads its initial data through the catalog server API; its client manager uses
-the admin photo Route Handler for updates.
+metadata defaults to private photo fixtures. Local edits use
+`admin/.data/photos.json`; production edits use Vercel Blob for both the photo
+list and uploaded images. The `/admin/photos` page loads its initial data through
+the catalog server API; its client manager uses the admin photo Route Handler for
+updates.
 
 When persistence is implemented, keep one product source for storefront and admin.
 `catalog` owns product types, validation, visibility rules, state transitions, and
@@ -148,7 +151,8 @@ add a shared transaction boundary only when a concrete use case needs one.
 - Validate uploads server-side and authorize storage writes when uploads are implemented.
 - Respect the installed Next.js caching model; Cache Components and React Compiler are enabled.
 
-Database/ORM, identity provider, media storage, deployment infrastructure, and the
-final product schema remain open decisions. Choose them as authorized features
-require them. Update this document, file placement guidance, and allowed module
-edges together when ownership or dependencies change.
+Database/ORM, identity provider, deployment infrastructure, and the final product
+schema remain open decisions. Vercel Blob is used for current admin photo media
+and metadata. Choose additional infrastructure as authorized features require
+it. Update this document, file placement guidance, and allowed module edges
+together when ownership or dependencies change.

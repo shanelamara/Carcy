@@ -44,11 +44,26 @@ export default function PhotosManager({ initialPhotos }: PhotosManagerProps) {
       const response = await fetch("/api/admin/photos");
       if (redirectIfSessionExpired(response)) return;
 
-      const nextPhotos = (await response.json()) as ProductPhoto[];
+      const result: unknown = await response.json();
+      if (!response.ok) {
+        const message =
+          typeof result === "object" &&
+          result !== null &&
+          "error" in result &&
+          typeof result.error === "string"
+            ? result.error
+            : "Could not load photos.";
+        throw new Error(message);
+      }
+      if (!Array.isArray(result)) {
+        throw new Error("The photo service returned invalid data.");
+      }
+
+      const nextPhotos = result as ProductPhoto[];
       setPhotos(nextPhotos);
       setStatus(nextPhotos.length > 0 ? "Photos loaded." : "No photos yet. Add the first one.");
-    } catch {
-      setStatus("Could not load photos.");
+    } catch (error) {
+      setStatus(error instanceof Error ? error.message : "Could not load photos.");
     }
   };
 
@@ -76,7 +91,7 @@ export default function PhotosManager({ initialPhotos }: PhotosManagerProps) {
       const result = (await response.json()) as ProductPhoto[] | { error?: string };
 
       if (!response.ok) {
-        throw new Error((result as { error?: string }).error ?? "Unable to save the photo.");
+        throw new Error(Array.isArray(result) ? "Unable to save the photo." : result.error ?? "Unable to save the photo.");
       }
 
       setPhotos(Array.isArray(result) ? result : photos);
@@ -113,7 +128,7 @@ export default function PhotosManager({ initialPhotos }: PhotosManagerProps) {
       const result = (await response.json()) as ProductPhoto[] | { error?: string };
 
       if (!response.ok) {
-        throw new Error((result as { error?: string }).error ?? "Unable to upload the image.");
+        throw new Error(Array.isArray(result) ? "Unable to upload the image." : result.error ?? "Unable to upload the image.");
       }
 
       setForm(emptyPhoto);
@@ -142,12 +157,18 @@ export default function PhotosManager({ initialPhotos }: PhotosManagerProps) {
       });
       if (redirectIfSessionExpired(response)) return;
 
+      const result = (await response.json()) as
+        | ProductPhoto[]
+        | { photos?: ProductPhoto[]; warning?: string; error?: string };
+
       if (!response.ok) {
-        throw new Error("Unable to delete the photo.");
+        throw new Error(Array.isArray(result) ? "Unable to delete the photo." : result.error ?? "Unable to delete the photo.");
       }
 
       await loadPhotos();
-      setStatus("Photo removed.");
+      setStatus(
+        Array.isArray(result) || !result.warning ? "Photo removed." : result.warning,
+      );
       if (form.id === photoId) {
         setForm(emptyPhoto);
       }
@@ -179,11 +200,13 @@ export default function PhotosManager({ initialPhotos }: PhotosManagerProps) {
 
             <div className="mt-6 space-y-4">
               <div className="space-y-2">
-                <span className="block text-sm font-medium text-[#161616]">Upload an image</span>
+                <span className="block text-sm font-medium text-[#161616]">
+                  Upload an image (JPEG, PNG, or WebP; up to 4 MB)
+                </span>
                 <label className="inline-flex cursor-pointer items-center justify-center rounded-full border border-[#d7d1ca] bg-white px-4 py-2 text-sm font-medium text-[#161616] transition hover:border-[#FF6500]">
                   <input
                     type="file"
-                    accept="image/*"
+                    accept="image/jpeg,image/png,image/webp"
                     aria-label="Choose a photo to upload"
                     onChange={handleUpload}
                     className="hidden"
