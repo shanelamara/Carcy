@@ -1,0 +1,168 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-11-06T15:34:17.120692+08:00",
+  "title": "Design System: CarCy 3D Shop",
+  "extensions": {
+    "colorMeta": {
+      "primary": {
+        "role": "primary",
+        "displayName": "Filament orange",
+        "canonical": "#FF6500",
+        "tonalRamp": [
+          "oklch(from #FF6500 0.15 c h)",
+          "oklch(from #FF6500 0.25 c h)",
+          "oklch(from #FF6500 0.35 c h)",
+          "oklch(from #FF6500 0.45 c h)",
+          "oklch(from #FF6500 0.55 c h)",
+          "oklch(from #FF6500 0.65 c h)",
+          "oklch(from #FF6500 0.8 c h)",
+          "oklch(from #FF6500 0.95 c h)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Rethink Sans",
+        "purpose": "Single variable family; display 64/40px, sections 48/32px, cards 24px, lead 20/18px, body 16px, labels 14px; weights 400/500."
+      }
+    },
+    "shadows": [
+      {
+        "name": "floating",
+        "value": "var(--shadow-floating)",
+        "purpose": "Floating menus and dialogs only."
+      }
+    ],
+    "motion": [
+      {
+        "name": "control",
+        "value": "var(--duration-control)",
+        "purpose": "State feedback; respect reduced motion."
+      },
+      {
+        "name": "ease-standard",
+        "value": "var(--ease-standard)",
+        "purpose": "Shared state-transition easing."
+      },
+      {
+        "name": "storefront-ease-out",
+        "value": [
+          0.16,
+          1,
+          0.3,
+          1
+        ],
+        "purpose": "Framer Motion entrances and shared default transitions."
+      },
+      {
+        "name": "storefront-default",
+        "value": "550ms",
+        "purpose": "Fallback Framer Motion duration; individual interactions override it."
+      },
+      {
+        "name": "entrance",
+        "value": "650ms",
+        "purpose": "One-time visible-on-server section and collection arrivals."
+      },
+      {
+        "name": "headline-unmask",
+        "value": "800ms",
+        "purpose": "Bounded clip-mask headline entrance."
+      },
+      {
+        "name": "sibling-stagger",
+        "value": "90ms",
+        "purpose": "Spacing between siblings in a revealed list or dialog."
+      },
+      {
+        "name": "catalog-layout",
+        "value": "350ms",
+        "purpose": "Product filter/sort layout and presence transition, without index delay; initial grid arrival uses the entrance and sibling-stagger timings."
+      },
+      {
+        "name": "color-preview",
+        "value": "320ms",
+        "purpose": "Overlapping entrance and exit between concept color renders."
+      },
+      {
+        "name": "contact-feedback",
+        "value": "150ms",
+        "purpose": "Contact action hover lift and press feedback."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "sm",
+        "value": "640px"
+      },
+      {
+        "name": "md",
+        "value": "768px"
+      },
+      {
+        "name": "lg",
+        "value": "1024px"
+      }
+    ],
+    "motionPolicy": {
+      "library": "framer-motion",
+      "direction": "Owner-requested Framer Motion on a Taste-guided physical-product shop.",
+      "effects": [
+        "masked entrances",
+        "staggered arrivals",
+        "organizer and wordmark parallax",
+        "catalog layout and presence",
+        "color transitions",
+        "reading progress",
+        "contact hover and press feedback"
+      ],
+      "controls": "Session-local manual pause/resume, live system reduced-motion changes, document visibility, and offscreen loop suspension.",
+      "fallback": "Server-rendered content stays visible; one-time entrances start after hydration and intersection.",
+      "ownership": "Shared preferences and reusable effects in src/components/shared; feature compositions remain in their modules."
+    },
+    "typographyScale": {
+      "display": {
+        "size": "clamp(40px, 4.45vw, 64px)",
+        "lineHeight": 1.04,
+        "weight": 400
+      },
+      "heading": {
+        "size": "clamp(32px, 3.34vw, 48px)",
+        "lineHeight": 1.12,
+        "weight": 400
+      },
+      "card": {
+        "size": "24px",
+        "lineHeight": 1.2,
+        "weight": 400
+      },
+      "lead": {
+        "size": "20px",
+        "mobileSize": "18px"
+      },
+      "body": {
+        "size": "16px",
+        "lineHeight": 1.65
+      },
+      "label": {
+        "size": "14px",
+        "lineHeight": 1.5
+      }
+    }
+  },
+  "components": [],
+  "narrative": {
+    "northStar": "A clear, product-led CarCy shop redesigned with Taste guidance.",
+    "overview": "White product-stage hero, neutral collection, orange personalization, original-logo story, and wordmark close.",
+    "dos": [
+      "Use the single Rethink Sans scale with readable 16px body and 14px labels.",
+      "Keep shared shadcn primitives and controlled Framer Motion.",
+      "Identify concept imagery and unconfirmed prices honestly."
+    ],
+    "donts": [
+      "Shrink controls or create section-specific heading scales.",
+      "Invent a checkout, stock, prices, reviews, or a product backend."
+    ]
+  },
+  "implementationStatus": "Taste-guided redesign over the existing modular-monolith storefront; concept data and Facebook inquiry flow."
+}
