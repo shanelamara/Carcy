@@ -43,8 +43,7 @@ async function AdminPhotosContent() {
           </h1>
           <p className="mt-4 text-base text-[#595959]">
             In Vercel, open this project’s Storage tab, create and connect a public Blob store, then
-            redeploy. Add its read-write token as BLOB_READ_WRITE_TOKEN in the deployment
-            environment.
+            redeploy. The deployment needs BLOB_STORE_ID or BLOB_READ_WRITE_TOKEN in its environment.
           </p>
         </section>
       </main>

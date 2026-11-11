@@ -37,7 +37,8 @@ export class ProductPhotoInputError extends Error {
 function isBlobStorageConfigured(): boolean {
   return Boolean(
     process.env.BLOB_READ_WRITE_TOKEN ||
-      (process.env.BLOB_STORE_ID && process.env.VERCEL_OIDC_TOKEN),
+      // On Vercel the SDK reads the OIDC token from the request at runtime, not from env.
+      (process.env.BLOB_STORE_ID && (process.env.VERCEL || process.env.VERCEL_OIDC_TOKEN)),
   );
 }
 
