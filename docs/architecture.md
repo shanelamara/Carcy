@@ -19,15 +19,19 @@ vertical carousel. Color previews and motion controls run locally in the browser
 Product details and availability remain unconfirmed. Contact links lead to
 Facebook; they do not submit an order.
 
-The admin portal, persistent products, authentication, uploads, and publication
-workflows remain planned. No database, auth provider, message broker, or event bus
-is added merely to establish the architecture.
+The `/admin/photos` screen provides a basic photo manager backed by
+`admin/.data/photos.json`, with uploaded files stored in
+`public/images/products`. Its API has no authentication and writes to the local
+filesystem, so it is only a prototype for trusted local use, not a safe public
+admin surface. The full admin portal, authenticated access, durable media and
+product storage, and publication workflows remain planned. No database, auth
+provider, message broker, or event bus is added merely to establish the architecture.
 
 ## Module ownership
 
 | Module | Owns | Dependencies |
 | --- | --- | --- |
-| `catalog` | Product contracts, collection filters, concept fixtures, catalog UI and product details; future product validation, management, visibility, and persistence | Shared code only |
+| `catalog` | Product contracts, collection filters, concept fixtures, catalog UI, product details, and local photo metadata; future product validation, management, visibility, and durable persistence | Shared code only |
 | `storefront` | Public page composition, navigation, hero, personalization preview, story, footer, and storefront motion composition | `catalog` through its public APIs, plus shared code |
 
 Future identity or media capabilities become modules when actual requirements
@@ -40,7 +44,8 @@ future `/admin` routes compose its public management capabilities.
 ```mermaid
 flowchart TD
     Routes[Next.js routes: src/app] --> Storefront[storefront/server public API]
-    Storefront --> CatalogServer[catalog/server public API]
+    Routes --> CatalogServer[catalog/server public API]
+    Storefront --> CatalogServer
     Storefront --> CatalogUI[catalog public UI API]
     CatalogServer --> Data[Private catalog fixtures or future persistence adapter]
     CatalogUI --> Shared[Shared shadcn UI and shared components]
@@ -103,9 +108,12 @@ permission to query the owner's tables directly.
 
 ## Product reads and mutations
 
-Today the server route composes `storefront/server`, which obtains selected photo
-metadata from `catalog/server` and passes serializable data into catalog UI.
-The photo fixtures are private to `catalog`.
+Today the server route composes `storefront/server`, which obtains photo metadata
+from `catalog/server` and passes serializable data into catalog UI. Catalog
+metadata defaults to private photo fixtures and is stored in
+`admin/.data/photos.json` after photo-manager edits. The `/admin/photos` page
+loads its initial data through the catalog server API; its client manager uses
+the admin photo Route Handler for updates.
 
 When persistence is implemented, keep one product source for storefront and admin.
 `catalog` owns product types, validation, visibility rules, state transitions, and

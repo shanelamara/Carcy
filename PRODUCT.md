@@ -20,7 +20,10 @@ product management through an admin portal.
 
 The storefront builds on the supplied prototype with an owner-supplied product
 photo gallery, color previews, a motion control, and Facebook contact links.
-Persistence, admin authentication, uploads, and publication are planned.
+A basic photo manager prototype at `/admin/photos` stores metadata in a local
+JSON file and uploaded images in the public product-image directory. It has no
+authentication and is suitable only for trusted local use. Durable persistence,
+admin authentication, and product publication are planned.
 The repository is a modular monolith: one Next.js app with private feature modules
 and explicit public APIs. The frontend approach is component-first, TypeScript, Tailwind, and local
 shadcn primitives customized by the website's design system. The owner requested an

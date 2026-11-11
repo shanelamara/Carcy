@@ -13,4 +13,5 @@ export type ProductPhoto = {
   alt: string;
   width: number;
   height: number;
+  order?: number;
 };

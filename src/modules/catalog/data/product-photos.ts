@@ -2,18 +2,18 @@ import "server-only";
 
 import type { ProductPhoto } from "../types/product-types";
 
-export const productPhotos: ProductPhoto[] = [
-  { id: "photo-01", src: "/images/products/photo-01.jpg", alt: "Colorful raised-letter designs arranged in several small groups.", width: 1174, height: 1564 },
-  { id: "photo-02", src: "/images/products/photo-02.jpg", alt: "A group of colorful small prints arranged on a dark surface.", width: 1170, height: 1560 },
-  { id: "photo-03", src: "/images/products/photo-03.jpg", alt: "Red and purple raised lettering displayed on white cards.", width: 1166, height: 874 },
-  { id: "photo-04", src: "/images/products/photo-04.jpg", alt: "Two colorful raised-letter designs on white cards.", width: 1166, height: 1556 },
-  { id: "photo-05", src: "/images/products/photo-05.jpg", alt: "Colorful raised lettering arranged on patterned cards.", width: 1174, height: 1564 },
-  { id: "photo-06", src: "/images/products/photo-06.jpg", alt: "Two red personalized name tags displayed with key rings.", width: 900, height: 1599 },
-  { id: "photo-08", src: "/images/products/photo-08.jpg", alt: "A purple butterfly-shaped keychain held in a hand.", width: 1170, height: 1560 },
-  { id: "photo-09", src: "/images/products/photo-09.jpg", alt: "Several small black printed cases with bright circular tops.", width: 1170, height: 1560 },
-  { id: "photo-12", src: "/images/products/photo-12.jpg", alt: "Red and black articulated figures displayed side by side.", width: 1166, height: 874 },
-  { id: "photo-13", src: "/images/products/photo-13.jpg", alt: "Blue-and-white personalized name tags with key rings.", width: 1170, height: 1560 },
-  { id: "photo-14", src: "/images/products/photo-14.jpg", alt: "Pink-and-white personalized name tags with key rings.", width: 1170, height: 1560 },
-  { id: "photo-15", src: "/images/products/photo-15.jpg", alt: "Packaged cross-shaped keychains with small clear accessories.", width: 1200, height: 1600 },
-  { id: "photo-16", src: "/images/products/photo-16.jpg", alt: "Packaged red and blue name tags with keychains and small clear accessories.", width: 1170, height: 1560 },
+export const defaultProductPhotos: ProductPhoto[] = [
+  { id: "photo-01", src: "/images/products/photo-01.jpg", alt: "Colorful raised-letter designs arranged in several small groups.", width: 1174, height: 1564, order: 0 },
+  { id: "photo-02", src: "/images/products/photo-02.jpg", alt: "A group of colorful small prints arranged on a dark surface.", width: 1170, height: 1560, order: 1 },
+  { id: "photo-03", src: "/images/products/photo-03.jpg", alt: "Red and purple raised lettering displayed on white cards.", width: 1166, height: 874, order: 2 },
+  { id: "photo-04", src: "/images/products/photo-04.jpg", alt: "Two colorful raised-letter designs on white cards.", width: 1166, height: 1556, order: 3 },
+  { id: "photo-05", src: "/images/products/photo-05.jpg", alt: "Colorful raised lettering arranged on patterned cards.", width: 1174, height: 1564, order: 4 },
+  { id: "photo-06", src: "/images/products/photo-06.jpg", alt: "Two red personalized name tags displayed with key rings.", width: 900, height: 1599, order: 5 },
+  { id: "photo-08", src: "/images/products/photo-08.jpg", alt: "A purple butterfly-shaped keychain held in a hand.", width: 1170, height: 1560, order: 6 },
+  { id: "photo-09", src: "/images/products/photo-09.jpg", alt: "Several small black printed cases with bright circular tops.", width: 1170, height: 1560, order: 7 },
+  { id: "photo-12", src: "/images/products/photo-12.jpg", alt: "Red and black articulated figures displayed side by side.", width: 1166, height: 874, order: 8 },
+  { id: "photo-13", src: "/images/products/photo-13.jpg", alt: "Blue-and-white personalized name tags with key rings.", width: 1170, height: 1560, order: 9 },
+  { id: "photo-14", src: "/images/products/photo-14.jpg", alt: "Pink-and-white personalized name tags with key rings.", width: 1170, height: 1560, order: 10 },
+  { id: "photo-15", src: "/images/products/photo-15.jpg", alt: "Packaged cross-shaped keychains with small clear accessories.", width: 1200, height: 1600, order: 11 },
+  { id: "photo-16", src: "/images/products/photo-16.jpg", alt: "Packaged red and blue name tags with keychains and small clear accessories.", width: 1170, height: 1560, order: 12 },
 ];

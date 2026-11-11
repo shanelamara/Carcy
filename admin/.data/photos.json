@@ -102,5 +102,21 @@
     "width": 1170,
     "height": 1560,
     "order": 12
+  },
+  {
+    "id": "photo-1794360176929",
+    "src": "/images/products/1794360177015-c3255m.jpg",
+    "alt": "viber_image_2026-11-10_14-55-23-394.jpg",
+    "width": 1200,
+    "height": 1600,
+    "order": 0
+  },
+  {
+    "id": "photo-1794365868961",
+    "src": "/images/products/1794365869835-5kwl6w.jpg",
+    "alt": "wp3391755-bible-verse-desktop-hd-wallpapers.jpg",
+    "width": 1200,
+    "height": 1600,
+    "order": 0
   }
 ]

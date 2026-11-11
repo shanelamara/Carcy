@@ -9,16 +9,26 @@ naming, validation, styling, and code standards.
 ## Current structure
 
 ```text
+admin/
+  .data/
+    photos.json                    # Local product-photo metadata store
 src/
   app/
     page.tsx                       # Thin route importing storefront/server
     layout.tsx                     # Root document, fonts, metadata
     globals.css                    # Shared tokens and storefront styles
     favicon.ico
+    admin/
+      page.tsx                     # Photo manager entry
+      photos/
+        page.tsx                   # Loads initial photo data
+        photos-manager.tsx         # Route-specific photo editing UI
+    api/
+      admin/photos/route.ts        # Photo manager API
   modules/
     catalog/
       index.ts                     # Public client-safe UI and types
-      server.ts                    # Public server-only concept data
+      server.ts                    # Public server-only catalog and photo data
       components/
         product-catalog.tsx
         product-card.tsx
