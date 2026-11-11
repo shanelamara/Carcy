@@ -3,7 +3,11 @@ import path from "node:path";
 
 import { NextResponse } from "next/server";
 
-import { hasAdminAccess, isSameOriginRequest } from "@/lib/admin-access";
+import {
+  hasAdminAccess,
+  isAdminAccessConfigured,
+  isSameOriginRequest,
+} from "@/lib/admin-access";
 import { getProductPhotos, saveProductPhotos } from "@/modules/catalog/server";
 import type { ProductPhoto } from "@/modules/catalog";
 
@@ -14,6 +18,17 @@ function unauthorizedResponse() {
     { error: "Enter the admin access code to continue." },
     { status: 401, headers: { "Cache-Control": "no-store" } },
   );
+}
+
+function accessUnavailableResponse() {
+  return NextResponse.json(
+    { error: "Admin access is not configured on this deployment." },
+    { status: 503, headers: { "Cache-Control": "no-store" } },
+  );
+}
+
+async function hasConfiguredAdminSession(): Promise<boolean> {
+  return isAdminAccessConfigured() && hasAdminAccess();
 }
 
 function normalizePhoto(input: Partial<ProductPhoto>): ProductPhoto {
@@ -62,8 +77,8 @@ async function handleUpload(formData: FormData): Promise<ProductPhoto> {
 }
 
 export async function GET() {
-  if (!(await hasAdminAccess())) {
-    return unauthorizedResponse();
+  if (!(await hasConfiguredAdminSession())) {
+    return isAdminAccessConfigured() ? unauthorizedResponse() : accessUnavailableResponse();
   }
 
   const photos = await getProductPhotos();
@@ -71,8 +86,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  if (!(await hasAdminAccess())) {
-    return unauthorizedResponse();
+  if (!(await hasConfiguredAdminSession())) {
+    return isAdminAccessConfigured() ? unauthorizedResponse() : accessUnavailableResponse();
   }
   if (!isSameOriginRequest(request)) {
     return NextResponse.json({ error: "Request origin is not allowed." }, { status: 403 });
@@ -103,8 +118,8 @@ export async function POST(request: Request) {
 }
 
 export async function PUT(request: Request) {
-  if (!(await hasAdminAccess())) {
-    return unauthorizedResponse();
+  if (!(await hasConfiguredAdminSession())) {
+    return isAdminAccessConfigured() ? unauthorizedResponse() : accessUnavailableResponse();
   }
   if (!isSameOriginRequest(request)) {
     return NextResponse.json({ error: "Request origin is not allowed." }, { status: 403 });
@@ -127,8 +142,8 @@ export async function PUT(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  if (!(await hasAdminAccess())) {
-    return unauthorizedResponse();
+  if (!(await hasConfiguredAdminSession())) {
+    return isAdminAccessConfigured() ? unauthorizedResponse() : accessUnavailableResponse();
   }
   if (!isSameOriginRequest(request)) {
     return NextResponse.json({ error: "Request origin is not allowed." }, { status: 403 });

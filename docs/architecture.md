@@ -27,8 +27,10 @@ stored in the `ADMIN_ACCESS_CODE` environment variable. The photo manager is
 backed by `admin/.data/photos.json`, with uploaded files stored in
 `public/images/products`. This shared code is a basic gate, not per-user
 authentication or a substitute for proper authentication and rate limiting on
-a public deployment. Durable media and product storage and publication workflows
-remain planned.
+a public deployment. If the code is missing or shorter than 16 characters, the
+admin screen displays a setup message and protected APIs return `503` rather than
+crashing. Durable media and product storage and publication workflows remain
+planned.
 
 ## Module ownership
 

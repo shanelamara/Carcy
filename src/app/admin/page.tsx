@@ -1,7 +1,7 @@
 import { Suspense } from "react";
 import { connection } from "next/server";
 
-import { hasAdminAccess } from "@/lib/admin-access";
+import { hasAdminAccess, isAdminAccessConfigured } from "@/lib/admin-access";
 import { AdminAccessPanel } from "./admin-access-panel";
 
 export const instant = false;
@@ -24,7 +24,12 @@ export default function AdminPage() {
 
 async function AdminPageContent() {
   await connection();
+  const isConfigured = isAdminAccessConfigured();
+  if (!isConfigured) {
+    return <AdminAccessPanel hasAccess={false} isConfigured={false} />;
+  }
+
   const hasAccess = await hasAdminAccess();
 
-  return <AdminAccessPanel hasAccess={hasAccess} />;
+  return <AdminAccessPanel hasAccess={hasAccess} isConfigured />;
 }

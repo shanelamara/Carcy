@@ -7,11 +7,11 @@ export const ADMIN_ACCESS_COOKIE = "carcy-admin-access";
 
 const SESSION_DURATION_SECONDS = 60 * 60 * 12;
 
-function getAdminAccessCode(): string {
+function getAdminAccessCode(): string | null {
   const accessCode = process.env.ADMIN_ACCESS_CODE;
 
   if (!accessCode || accessCode.length < 16) {
-    throw new Error("Set ADMIN_ACCESS_CODE to a secret of at least 16 characters.");
+    return null;
   }
 
   return accessCode;
@@ -37,11 +37,23 @@ function matchesConstantTime(actual: string, expected: string): boolean {
 export function verifyAdminAccessCode(candidate: unknown): boolean {
   const accessCode = getAdminAccessCode();
 
-  return typeof candidate === "string" && matchesConstantTime(candidate, accessCode);
+  return (
+    accessCode !== null &&
+    typeof candidate === "string" &&
+    matchesConstantTime(candidate, accessCode)
+  );
+}
+
+export function isAdminAccessConfigured(): boolean {
+  return getAdminAccessCode() !== null;
 }
 
 export async function hasAdminAccess(): Promise<boolean> {
   const accessCode = getAdminAccessCode();
+  if (!accessCode) {
+    return false;
+  }
+
   const token = (await cookies()).get(ADMIN_ACCESS_COOKIE)?.value;
   const [expiresAtValue, signature, extra] = token?.split(".") ?? [];
 
@@ -59,6 +71,10 @@ export async function hasAdminAccess(): Promise<boolean> {
 
 export async function createAdminSession(): Promise<void> {
   const accessCode = getAdminAccessCode();
+  if (!accessCode) {
+    throw new Error("Admin access is not configured.");
+  }
+
   const expiresAt = Date.now() + SESSION_DURATION_SECONDS * 1000;
   const cookieStore = await cookies();
 

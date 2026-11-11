@@ -3,11 +3,19 @@ import { NextResponse } from "next/server";
 import {
   clearAdminSession,
   createAdminSession,
+  isAdminAccessConfigured,
   isSameOriginRequest,
   verifyAdminAccessCode,
 } from "@/lib/admin-access";
 
 export async function POST(request: Request) {
+  if (!isAdminAccessConfigured()) {
+    return NextResponse.json(
+      { error: "Admin access is not configured on this deployment." },
+      { status: 503, headers: { "Cache-Control": "no-store" } },
+    );
+  }
+
   if (!isSameOriginRequest(request)) {
     return NextResponse.json({ error: "Request origin is not allowed." }, { status: 403 });
   }

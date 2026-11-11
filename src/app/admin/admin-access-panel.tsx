@@ -6,9 +6,10 @@ import { useState } from "react";
 
 type AdminAccessPanelProps = {
   hasAccess: boolean;
+  isConfigured: boolean;
 };
 
-export function AdminAccessPanel({ hasAccess }: AdminAccessPanelProps) {
+export function AdminAccessPanel({ hasAccess, isConfigured }: AdminAccessPanelProps) {
   const router = useRouter();
   const [accessCode, setAccessCode] = useState("");
   const [message, setMessage] = useState("");
@@ -67,15 +68,21 @@ export function AdminAccessPanel({ hasAccess }: AdminAccessPanelProps) {
           Admin
         </p>
         <h1 className="text-4xl font-semibold tracking-[-0.06em]">
-          {hasAccess ? "CarCy photo manager" : "Enter your access code"}
+          {!isConfigured
+            ? "Admin access isn’t configured"
+            : hasAccess
+              ? "CarCy photo manager"
+              : "Enter your access code"}
         </h1>
         <p className="mt-4 text-base text-[#595959]">
-          {hasAccess
-            ? "Manage the product photos shown on the storefront."
-            : "Use the private admin access code to continue."}
+          {!isConfigured
+            ? "Set ADMIN_ACCESS_CODE in the deployment’s environment variables, then redeploy."
+            : hasAccess
+              ? "Manage the product photos shown on the storefront."
+              : "Use the private admin access code to continue."}
         </p>
 
-        {hasAccess ? (
+        {isConfigured && hasAccess ? (
           <div className="mt-8 flex flex-wrap gap-3">
             <Link
               href="/admin/photos"
@@ -92,7 +99,7 @@ export function AdminAccessPanel({ hasAccess }: AdminAccessPanelProps) {
               Sign out
             </button>
           </div>
-        ) : (
+        ) : isConfigured ? (
           <form onSubmit={handleSubmit} className="mt-8 space-y-4">
             <label htmlFor="admin-access-code" className="block text-sm font-medium">
               Access code
@@ -117,7 +124,7 @@ export function AdminAccessPanel({ hasAccess }: AdminAccessPanelProps) {
               {isSubmitting ? "Checking..." : "Continue"}
             </button>
           </form>
-        )}
+        ) : null}
 
         {message && (
           <p id="admin-access-message" role="status" className="mt-4 text-sm text-[#8b1e12]">
