@@ -1,6 +1,6 @@
 import "server-only";
 
-import { unstable_noStore as noStore } from "next/cache";
+import { connection } from "next/server";
 
 import { ProductPhotoGallery } from "@/modules/catalog";
 import { getProductPhotos } from "@/modules/catalog/server";
@@ -13,7 +13,8 @@ import { StorefrontMotionProvider } from "./storefront-motion-provider";
 import { StorefrontStory } from "./storefront-story";
 
 export async function StorefrontPage() {
-  noStore();
+  // Blob reads need request-time OIDC credentials, so never prerender this at build.
+  await connection();
   const photos = await getProductPhotos();
 
   return (
